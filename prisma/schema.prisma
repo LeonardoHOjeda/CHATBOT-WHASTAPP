@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int          @id @default(autoincrement())
+  email           String       @unique
+  name            String
+  last_name       String
+  password        String
+  role            Role         @relation(fields: [roleId], references: [id])
+  roleId          Int
+  createdAt       DateTime     @default(now()) @map("created_at")
+  profile_picture String
+  UserSenders     UserSender[]
+  Notes           Note[]
+
+  @@map("user")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  role  String
+  Users User[]
+
+  @@map("roles")
+}
+
+model Sender {
+  id              Int          @id @default(autoincrement())
+  name            String
+  telephone       String
+  email           String
+  profile_picture String
+  budget          Float
+  createdAt       DateTime     @default(now())
+  UserSenders     UserSender[]
+  Messages        Message[]
+
+  @@map("senders")
+}
+
+model UserSender {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  sender    Sender   @relation(fields: [senderId], references: [id])
+  senderId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime @default(now())
+
+  @@map("user_sender")
+}
+
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  Messages  Message[]
+  Notes     Note[]
+
+  @@map("conversation")
+}
+
+model Message {
+  id             Int            @id @default(autoincrement())
+  conversationId Int            @map("conversation_id")
+  conversation   Conversation   @relation(fields: [conversationId], references: [id])
+  senderId       Int
+  sender         Sender         @relation(fields: [senderId], references: [id])
+  message        String
+  createdAt      DateTime       @default(now()) @map("created_at")
+  seen           Boolean        @default(false)
+  LabelMessages  LabelMessage[]
+
+  @@map("messages")
+}
+
+model Note {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+  note           String
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@map("notes")
+}
+
+model Label {
+  id            Int            @id @default(autoincrement())
+  name          String
+  color         String
+  createdAt     DateTime       @default(now()) @map("created_at")
+  LabelMessages LabelMessage[]
+
+  @@map("labels")
+}
+
+model LabelMessage {
+  id        Int      @id @default(autoincrement())
+  labelId   Int
+  label     Label    @relation(fields: [labelId], references: [id])
+  messageId Int
+  message   Message  @relation(fields: [messageId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("label_message")
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
