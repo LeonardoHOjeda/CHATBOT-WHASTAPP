@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express'
 const rateLimiter = new RateLimiterMemory({
   keyPrefix: 'middleware',
   points: 5, // 5 requests
-  duration: 1, // per 1 second by IP
+  duration: 1 // per 1 second by IP
 })
 
 export const rateLimiterMiddleware = (

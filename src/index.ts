@@ -12,13 +12,13 @@ import { handleErrorMiddleware } from './middlewares/error_handler'
 class Server {
   public app: express.Application
 
-  constructor() {
+  constructor () {
     this.app = express()
     this.middlewares()
     this.routes()
   }
 
-  middlewares() {
+  middlewares () {
     this.app.use(morgan('[:date[iso]] (:status) ":method :url HTTP/:http-version" :response-time ms - [:res[content-length]]'))
     this.app.use(cors())
     this.app.use(rateLimiterMiddleware)
@@ -27,12 +27,12 @@ class Server {
     this.app.use(express.urlencoded({ extended: false }))
   }
 
-  routes() {
+  routes () {
     this.app.use(routes)
     this.app.use(handleErrorMiddleware)
   }
 
-  start() {
+  start () {
     this.app.listen(settings.PORT, () => {
       logger.info('🚀 Server listen on port ' + settings.PORT)
     })
