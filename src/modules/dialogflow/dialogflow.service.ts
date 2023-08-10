@@ -27,7 +27,6 @@ export async function sendDataToDialogFlow (msg: string, session: string, params
         }
       }
     }
-    console.log('REQUEST: ', request)
 
     const responses = await sessionClient.detectIntent(request)
     const result = responses[0].queryResult
@@ -55,6 +54,8 @@ export async function sendDataToDialogFlow (msg: string, session: string, params
       })
     }
     result.fulfillmentMessages = defaultResponses
+    console.log(JSON.stringify(result, null, ' '))
+    return result
   } catch (error) {
     console.log('Error en sendDataToDialogFlow: ', error)
   }
