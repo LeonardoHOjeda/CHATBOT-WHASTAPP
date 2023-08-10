@@ -32,7 +32,9 @@ class SessionService {
     })
 
     this.client.on('message', async (message) => {
-      const userName = (await message.getContact()).pushname
+      const contact = await message.getContact()
+      if (contact.isGroup || message.isStatus) return
+      const userName = contact.pushname
       console.log('Message 1: ', await message.getContact())
       console.log('Message: ', message)
 
