@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
+import fs from 'fs'
 import { settings } from '@config/settings'
 import { sendDataToDialogFlow } from '@modules/dialogflow/dialogflow.service'
 import { Client, LocalAuth } from 'whatsapp-web.js'
@@ -31,21 +32,35 @@ class SessionService {
     })
 
     this.client.on('message', async (message) => {
+      const userName = (await message.getContact()).pushname
+      console.log('Message 1: ', await message.getContact())
+      console.log('Message: ', message)
+
       const payload: any = await sendDataToDialogFlow(message.body, message.from, {})
       console.log('Payload: ', payload)
 
       const responses = payload.fulfillmentMessages
       console.log('Responses: ', responses)
 
-      if (message.from === '5214613371815@c.us') {
+      if (message.from === '5214111267600@c.us') {
         for (const response of responses) {
-          await this.client.sendMessage(message.from, response.text.text[0])
+          const originalMessage: string = response.text.text[0]
+          const messageToSend = await originalMessage.replace('{nombre}', userName)
+          await this.client.sendMessage(message.from, messageToSend)
         }
       }
     })
 
     void this.client.initialize()
   }
+}
+
+export function initSession () {
+  const files = fs.readdirSync('wwebjs_auth')
+  files.forEach((file) => {
+    const number = file.split('-')[1]
+    SessionService.startClient(number)
+  })
 }
 
 export default SessionService

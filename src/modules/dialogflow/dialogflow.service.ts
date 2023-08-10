@@ -1,4 +1,4 @@
-import { SessionsClient } from '@google-cloud/dialogflow'
+import { SessionsClient, protos } from '@google-cloud/dialogflow'
 import { settings } from '@config/settings'
 
 const sessionClient = new SessionsClient({
@@ -13,7 +13,7 @@ export async function sendDataToDialogFlow (msg: string, session: string, params
       settings.GOOGLE.GOOGLE_PROJECT_ID,
       session
     )
-    const request = {
+    const request: protos.google.cloud.dialogflow.v2.IDetectIntentRequest = {
       session: sessionPath,
       queryInput: {
         text: {

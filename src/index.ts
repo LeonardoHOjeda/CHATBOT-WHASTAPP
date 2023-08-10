@@ -8,6 +8,7 @@ import routes from './router'
 import { rateLimiterMiddleware } from './middlewares/rate_limiter'
 import { settings } from './config/settings'
 import { handleErrorMiddleware } from './middlewares/error_handler'
+import { initSession } from '@modules/sessions/session.service'
 
 class Server {
   public app: express.Application
@@ -34,10 +35,11 @@ class Server {
 
   start () {
     this.app.listen(settings.PORT, () => {
-      logger.info('🚀 Server listen on port ' + settings.PORT)
+      logger.info(`🚀 Server listen on port ${settings.PORT}`)
     })
   }
 }
 
 const server = new Server()
 server.start()
+initSession()
