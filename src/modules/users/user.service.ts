@@ -46,15 +46,15 @@ export async function updateSender (id: number, data: Sender) {
 }
 
 // Elimina de manera logica el sender
-export async function deleteSender (id: number) {
-  const sender = await prisma.sender.update({
-    where: {
-      id
-    },
-    data: {
-      deleted: true
-    }
-  })
+// export async function deleteSender (id: number) {
+//   const sender = await prisma.sender.update({
+//     where: {
+//       id
+//     },
+//     data: {
+//       deleted: true
+//     }
+//   })
 
-  return sender
-}
+//   return sender
+// }

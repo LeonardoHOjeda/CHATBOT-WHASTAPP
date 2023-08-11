@@ -3,6 +3,7 @@ import fs from 'fs'
 import { settings } from '@config/settings'
 import { sendDataToDialogFlow } from '@modules/dialogflow/dialogflow.service'
 import { Client, LocalAuth } from 'whatsapp-web.js'
+import { createSender } from '@modules/senders/sender.service'
 
 class SessionService {
   private static client: Client
@@ -35,14 +36,20 @@ class SessionService {
       const contact = await message.getContact()
       if (contact.isGroup || message.isStatus) return
       const userName = contact.pushname
-      console.log('Message 1: ', await message.getContact())
-      console.log('Message: ', message)
+      console.log('Message 1: ', contact)
+      // console.log('Message: ', message)
 
       const payload: any = await sendDataToDialogFlow(message.body, message.from, {})
-      console.log('Payload: ', payload)
+      // console.log('Payload: ', payload)
 
       const responses = payload.fulfillmentMessages
-      console.log('Responses: ', responses)
+      // console.log('Responses: ', responses)
+      const data = {
+        name: userName,
+        telephone: contact.number,
+        budget: 0
+      }
+      await createSender(data)
 
       if (message.from === '5214111267600@c.us') {
         for (const response of responses) {

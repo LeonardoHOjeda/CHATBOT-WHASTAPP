@@ -6,17 +6,17 @@ generator client {
 }
 
 model User {
-  id              Int          @id @default(autoincrement())
-  email           String       @unique
-  name            String
-  last_name       String
-  password        String
-  role            Role         @relation(fields: [roleId], references: [id])
-  roleId          Int
-  createdAt       DateTime     @default(now()) @map("created_at")
-  profile_picture String
-  UserSenders     UserSender[]
-  Notes           Note[]
+  id             Int          @id @default(autoincrement())
+  email          String       @unique
+  name           String
+  last_name      String
+  password       String
+  role           Role         @relation(fields: [roleId], references: [id])
+  roleId         Int
+  createdAt      DateTime     @default(now()) @map("created_at")
+  profilePicture String
+  UserSenders    UserSender[]
+  Notes          Note[]
 
   @@map("user")
 }
@@ -30,15 +30,15 @@ model Role {
 }
 
 model Sender {
-  id              Int          @id @default(autoincrement())
-  name            String
-  telephone       String
-  email           String
-  profile_picture String
-  budget          Float
-  createdAt       DateTime     @default(now())
-  UserSenders     UserSender[]
-  Messages        Message[]
+  id             Int          @id @default(autoincrement())
+  name           String
+  phone          String       @unique
+  email          String?
+  profilePicture String?      @map("profile_picture")
+  budget         Float
+  createdAt      DateTime     @default(now()) @map("created_at")
+  UserSenders    UserSender[]
+  Messages       Message[]
 
   @@map("senders")
 }

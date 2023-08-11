@@ -1,6 +1,12 @@
 import { HTTPError } from '@middlewares/error_handler'
 import { Sender } from '@prisma/client'
-import { prisma } from 'db/client'
+import { prisma } from '@db/client'
+
+interface CreateSenderData {
+  name: string
+  telephone: string
+  budget: number
+}
 
 export async function getAllSenders () {
   const senders = await prisma.sender.findMany()
@@ -22,11 +28,9 @@ export async function getSenderById (id: number) {
   return sender
 }
 
-export async function createSender (data: Sender) {
+export async function createSender (data: CreateSenderData) {
   const sender = await prisma.sender.create({
-    data: {
-      ...data
-    }
+    data
   })
 
   return sender

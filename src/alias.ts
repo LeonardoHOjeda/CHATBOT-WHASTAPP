@@ -3,7 +3,7 @@ import moduleAlias from 'module-alias'
 
 moduleAlias.addAliases({
   '@src': __dirname,
-  '@database': path.join(__dirname, 'database'),
+  '@db': path.join(__dirname, 'db'),
   '@entities': path.join(__dirname, 'entities'),
   '@models': path.join(__dirname, 'models'),
   '@middlewares': path.join(__dirname, 'middlewares'),

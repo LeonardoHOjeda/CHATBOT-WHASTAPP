@@ -10,7 +10,7 @@
     "typeRoots": ["@types", "node_modules/@types"],
     "paths": {
       "@src/*": ["src/*"],
-      "@database/*": ["database/*"],
+      "@db/*": ["db/*"],
       "@entities/*": ["entities/*"],
       "@models/*": ["models/*"],
       "@middlewares/*": ["middlewares/*"],
