@@ -66,6 +66,27 @@ class SessionService {
       }
     })
 
+    this.client.on('message_create', async (message) => {
+      if (!message.fromMe) return
+
+      const contact = await message.getContact()
+      const myNumber = message.to.split('@')[0]
+
+      const data = {
+        phone: myNumber,
+        adminPhone: contact.number,
+        isFromMe: true,
+        name: 'Admin',
+        message: message.body,
+        budget: 0
+      }
+
+      await startConversation(data)
+
+      console.log('Message: ', message)
+      console.log('getContact(): ', contact)
+    })
+
     void this.client.initialize()
   }
 }

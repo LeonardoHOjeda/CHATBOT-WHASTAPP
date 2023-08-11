@@ -1,27 +1,36 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import './alias'
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
 import helmet from 'helmet'
-import logger from './helpers/logger'
-import routes from './router'
 import { rateLimiterMiddleware } from './middlewares/rate_limiter'
-import { settings } from './config/settings'
 import { handleErrorMiddleware } from './middlewares/error_handler'
+import SocketIO from './socket'
+import { createServer, Server } from 'http'
+import logger from './helpers/logger'
+
+// importing routes
+import routes from './router'
+
+// importing configs
+import { settings } from './config/settings'
 import { initSession } from '@modules/sessions/session.service'
 
-class Server {
+class App {
   public app: express.Application
+  public server: Server
 
   constructor () {
     this.app = express()
     this.middlewares()
     this.routes()
+    this.server = createServer(this.app)
   }
 
   middlewares () {
     this.app.use(morgan('[:date[iso]] (:status) ":method :url HTTP/:http-version" :response-time ms - [:res[content-length]]'))
-    this.app.use(cors())
+    this.app.use(cors({ origin: '*' }))
     this.app.use(rateLimiterMiddleware)
     this.app.use(helmet())
     this.app.use(express.json())
@@ -40,6 +49,7 @@ class Server {
   }
 }
 
-const server = new Server()
-server.start()
+const app = new App()
+app.start()
+SocketIO.init(app.server)
 initSession()
