@@ -4,7 +4,7 @@ import { prisma } from '@db/client'
 
 interface CreateSenderData {
   name: string
-  telephone: string
+  phone: string
   budget: number
 }
 
@@ -24,6 +24,16 @@ export async function getSenderById (id: number) {
   if (sender == null) {
     throw new HTTPError(404, 'Sender not found')
   }
+
+  return sender
+}
+
+export async function getSenderByPhone (phone: string) {
+  const sender = await prisma.sender.findUnique({
+    where: {
+      phone
+    }
+  })
 
   return sender
 }

@@ -36,8 +36,6 @@ export async function sendDataToDialogFlow (msg: string, session: string, params
       return
     }
 
-    console.log(responses)
-
     console.log('INTENT EMPAREJADO: ', result.intent!.displayName)
 
     const defaultResponses: any[] = []
@@ -54,7 +52,6 @@ export async function sendDataToDialogFlow (msg: string, session: string, params
       })
     }
     result.fulfillmentMessages = defaultResponses
-    console.log(JSON.stringify(result, null, ' '))
     return result
   } catch (error) {
     console.log('Error en sendDataToDialogFlow: ', error)

@@ -9,12 +9,12 @@ model User {
   id             Int          @id @default(autoincrement())
   email          String       @unique
   name           String
-  last_name      String
+  lastName       String       @map("last_name")
   password       String
   role           Role         @relation(fields: [roleId], references: [id])
-  roleId         Int
+  roleId         Int          @map("id_role")
   createdAt      DateTime     @default(now()) @map("created_at")
-  profilePicture String
+  profilePicture String       @map("profile_picture")
   UserSenders    UserSender[]
   Notes          Note[]
 
@@ -30,25 +30,26 @@ model Role {
 }
 
 model Sender {
-  id             Int          @id @default(autoincrement())
-  name           String
-  phone          String       @unique
-  email          String?
-  profilePicture String?      @map("profile_picture")
-  budget         Float
-  createdAt      DateTime     @default(now()) @map("created_at")
-  UserSenders    UserSender[]
-  Messages       Message[]
+  id                   Int            @id @default(autoincrement())
+  name                 String
+  phone                String         @unique
+  email                String?
+  profilePicture       String?        @map("profile_picture")
+  budget               Float
+  createdAt            DateTime       @default(now()) @map("created_at")
+  UserSenders          UserSender[]
+  ConversationAsClient Conversation[] @relation(name: "ClientRelation")
+  ConversationAsAdmin  Conversation[] @relation(name: "AdminRelation")
 
   @@map("senders")
 }
 
 model UserSender {
   id        Int      @id @default(autoincrement())
+  userId    Int      @map("id_user")
   user      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  senderId  Int      @map("id_sender")
   sender    Sender   @relation(fields: [senderId], references: [id])
-  senderId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime @default(now())
@@ -57,33 +58,37 @@ model UserSender {
 }
 
 model Conversation {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now()) @map("created_at")
-  Messages  Message[]
-  Notes     Note[]
+  id                 Int                 @id @default(autoincrement())
+  createdAt          DateTime            @default(now()) @map("created_at")
+  clientId           Int                 @map("id_client")
+  client             Sender              @relation(name: "ClientRelation", fields: [clientId], references: [id])
+  adminId            Int                 @map("id_admin")
+  admin              Sender              @relation(name: "AdminRelation", fields: [adminId], references: [id])
+  Messages           Message[]
+  Notes              Note[]
+  LabelConversations LabelConversation[]
 
-  @@map("conversation")
+  @@unique([clientId, adminId])
+  @@map("conversations")
 }
 
 model Message {
-  id             Int            @id @default(autoincrement())
-  conversationId Int            @map("conversation_id")
-  conversation   Conversation   @relation(fields: [conversationId], references: [id])
-  senderId       Int
-  sender         Sender         @relation(fields: [senderId], references: [id])
+  id             Int          @id @default(autoincrement())
+  conversationId Int          @map("id_conversation")
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
   message        String
-  createdAt      DateTime       @default(now()) @map("created_at")
-  seen           Boolean        @default(false)
-  LabelMessages  LabelMessage[]
+  createdAt      DateTime     @default(now()) @map("created_at")
+  seen           Boolean      @default(false)
+  isFromMe       Boolean      @map("is_from_me")
 
   @@map("messages")
 }
 
 model Note {
   id             Int          @id @default(autoincrement())
-  conversationId Int
+  conversationId Int          @map("id_conversation")
   conversation   Conversation @relation(fields: [conversationId], references: [id])
-  userId         Int
+  userId         Int          @map("id_user")
   user           User         @relation(fields: [userId], references: [id])
   note           String
   createdAt      DateTime     @default(now()) @map("created_at")
@@ -92,24 +97,35 @@ model Note {
 }
 
 model Label {
-  id            Int            @id @default(autoincrement())
-  name          String
-  color         String
-  createdAt     DateTime       @default(now()) @map("created_at")
-  LabelMessages LabelMessage[]
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  backgroundColorId  Int                 @map("id_background_color")
+  Color              Color               @relation(fields: [backgroundColorId], references: [id])
+  createdAt          DateTime            @default(now()) @map("created_at")
+  LabelConversations LabelConversation[]
 
   @@map("labels")
 }
 
-model LabelMessage {
-  id        Int      @id @default(autoincrement())
-  labelId   Int
-  label     Label    @relation(fields: [labelId], references: [id])
-  messageId Int
-  message   Message  @relation(fields: [messageId], references: [id])
-  createdAt DateTime @default(now()) @map("created_at")
+model LabelConversation {
+  id             Int          @id @default(autoincrement())
+  labelId        Int          @map("id_label")
+  label          Label        @relation(fields: [labelId], references: [id])
+  conversationId Int          @map("id_conversation")
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  createdAt      DateTime     @default(now()) @map("created_at")
 
-  @@map("label_message")
+  @@map("label_conversations")
+}
+
+model Color {
+  id     Int     @id @default(autoincrement())
+  name   String
+  hex    String
+  isDark Boolean @map("is_dark")
+  Label  Label[]
+
+  @@map("colors")
 }
 
 datasource db {

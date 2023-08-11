@@ -3,7 +3,9 @@ import fs from 'fs'
 import { settings } from '@config/settings'
 import { sendDataToDialogFlow } from '@modules/dialogflow/dialogflow.service'
 import { Client, LocalAuth } from 'whatsapp-web.js'
-import { createSender } from '@modules/senders/sender.service'
+import { createSender, getSenderByPhone } from '@modules/senders/sender.service'
+import { createConversation, getConversationByClientId } from '@modules/conversations/conversation.service'
+import { createMessage } from '@modules/messages/message.service'
 
 class SessionService {
   private static client: Client
@@ -34,22 +36,26 @@ class SessionService {
 
     this.client.on('message', async (message) => {
       const contact = await message.getContact()
+      const myNumber = message.to.split('@')[0]
       if (contact.isGroup || message.isStatus) return
       const userName = contact.pushname
-      console.log('Message 1: ', contact)
-      // console.log('Message: ', message)
+      console.log('getContact(): ', contact)
+      console.log('Message: ', message)
 
+      // DialogFlow
       const payload: any = await sendDataToDialogFlow(message.body, message.from, {})
-      // console.log('Payload: ', payload)
-
       const responses = payload.fulfillmentMessages
-      // console.log('Responses: ', responses)
+
       const data = {
+        phone: contact.number,
+        adminPhone: myNumber,
+        isFromMe: message.fromMe,
         name: userName,
-        telephone: contact.number,
+        message: message.body,
         budget: 0
       }
-      await createSender(data)
+
+      await startConversation(data)
 
       if (message.from === '5214111267600@c.us') {
         for (const response of responses) {
@@ -62,6 +68,29 @@ class SessionService {
 
     void this.client.initialize()
   }
+}
+
+async function startConversation (data: any) {
+  // Recibimos el to del mensaje
+  const admin = await getSenderByPhone(data.adminPhone)
+  console.log('admin: ', admin)
+  let sender = await getSenderByPhone(data.phone)
+
+  // Agregamos el numero de telefono a la BD si no existe
+  if (sender == null) {
+    sender = await createSender({ name: data.name, phone: data.phone, budget: data.budget })
+  }
+  console.log('sender: ', sender)
+
+  let conversation = await getConversationByClientId(sender.id)
+
+  // Insertarmos una conversacion en la BD si no existe
+  if (conversation == null) {
+    conversation = await createConversation(sender.id, admin!.id)
+  }
+  // Insertamos el mensaje recibido en la BD
+  await createMessage({ conversationId: conversation.id, isFromMe: data.isFromMe, message: data.message })
+  //
 }
 
 export function initSession () {
