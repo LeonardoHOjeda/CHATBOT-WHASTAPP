@@ -57,7 +57,7 @@ class SessionService {
 
       await startConversation(data)
 
-      if (message.from === '5214111267600@c.us') {
+      if (message.from === '5214613371815@c.us') {
         for (const response of responses) {
           const originalMessage: string = response.text.text[0]
           const messageToSend = await originalMessage.replace('{nombre}', userName)
