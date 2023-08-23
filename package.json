@@ -29,7 +29,7 @@
     "morgan": "^1.10.0",
     "rate-limiter-flexible": "^2.4.2",
     "socket.io": "^4.7.2",
-    "whatsapp-web.js": "^1.21.1-alpha.1",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#abac063b779570729476cf42e29dc694e5345ca6",
     "winston": "^3.10.0"
   },
   "devDependencies": {
