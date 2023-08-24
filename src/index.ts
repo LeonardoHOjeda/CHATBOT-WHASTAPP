@@ -1,3 +1,4 @@
+/* eslint-disable no-new */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import './alias'
 import express from 'express'
@@ -7,7 +8,7 @@ import helmet from 'helmet'
 import { rateLimiterMiddleware } from './middlewares/rate_limiter'
 import { handleErrorMiddleware } from './middlewares/error_handler'
 import SocketIO from './socket'
-import { createServer, Server } from 'http'
+import { Server } from 'http'
 import logger from './helpers/logger'
 
 // importing routes
@@ -19,14 +20,15 @@ import { initSession } from '@modules/sessions/session.service'
 
 class App {
   public app: express.Application
-  public server: Server
 
   constructor () {
     this.app = express()
+    this.config()
     this.middlewares()
     this.routes()
-    this.server = createServer(this.app)
   }
+
+  config () {}
 
   middlewares () {
     this.app.use(morgan('[:date[iso]] (:status) ":method :url HTTP/:http-version" :response-time ms - [:res[content-length]]'))
@@ -42,14 +44,14 @@ class App {
     this.app.use(handleErrorMiddleware)
   }
 
-  start () {
-    this.app.listen(settings.PORT, () => {
+  start (): Server {
+    return this.app.listen(settings.PORT, () => {
       logger.info(`🚀 Server listen on port ${settings.PORT}`)
     })
   }
 }
 
 const app = new App()
-app.start()
-SocketIO.init(app.server)
+const server = app.start()
+new SocketIO(server)
 initSession()
