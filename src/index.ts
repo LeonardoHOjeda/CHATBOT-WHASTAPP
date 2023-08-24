@@ -15,6 +15,7 @@ import routes from './router'
 
 // importing configs
 import { settings } from './config/settings'
+import { initSession } from '@modules/sessions/session.service'
 
 class App {
   public app: express.Application
@@ -51,4 +52,5 @@ class App {
 
 const app = new App()
 const server = app.start()
+initSession()
 Socket.init(server)
