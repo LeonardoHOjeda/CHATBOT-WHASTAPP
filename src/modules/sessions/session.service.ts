@@ -6,6 +6,7 @@ import { Client, LocalAuth } from 'whatsapp-web.js'
 import { createSender, getSenderByPhone } from '@modules/senders/sender.service'
 import { createConversation, getConversationByClientId } from '@modules/conversations/conversation.service'
 import { createMessage } from '@modules/messages/message.service'
+import { Socket } from '../../socket'
 
 class SessionService {
   private static client: Client
@@ -57,7 +58,9 @@ class SessionService {
 
       await startConversation(data)
 
-      if (message.from === '5214613371815@c.us') {
+      Socket.io.emit(`message-${'5214111181431'}`, data)
+
+      if (message.from === '5214111267600@c.us') {
         for (const response of responses) {
           const originalMessage: string = response.text.text[0]
           const messageToSend = await originalMessage.replace('{nombre}', userName)

@@ -5,7 +5,7 @@ import * as SocketController from './socket.controller'
 import { mensajeRecibido } from '@modules/messages/message.socket.controller'
 
 export class Socket {
-  private static io: SocketIO.Server
+  public static io: SocketIO.Server
   //
   private constructor () { }
 
